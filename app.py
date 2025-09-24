@@ -130,25 +130,3 @@ if start_button:
 
     # Calculate the MSE (Mean Squared Error) for each (m, b) pair
     Z = np.mean((y[:, None, None] - (M * X.ravel() + B))**2, axis=0)
-
-    # Create the 3D plot
-    fig4 = plt.figure(figsize=(10, 8))
-    ax4 = fig4.add_subplot(111, projection='3d')
-
-    # Plot the surface
-    ax4.plot_surface(M, B, Z, cmap='viridis', edgecolor='none')
-
-    # Plot the gradient descent path
-    m_history = [m for m, b in gd.history]
-    b_history = [b for m, b in gd.history]
-    ax4.plot(m_history, b_history, np.mean((y[:, None] - (np.array(m_history) * X.ravel() + np.array(b_history)))**2, axis=0), color='r', label='GD Path', linewidth=2)
-
-    # Set labels
-    ax4.set_xlabel('m (slope)')
-    ax4.set_ylabel('b (intercept)')
-    ax4.set_zlabel('Error (MSE)')
-    ax4.set_title('Gradient Descent on Error Surface')
-    ax4.legend()
-
-    # Display the 3D surface plot
-    st.pyplot(fig4)
