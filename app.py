@@ -168,7 +168,11 @@ if start_button:
     # Plot the gradient descent path
     m_history = [m for m, b in gd.history]
     b_history = [b for m, b in gd.history]
-    ax4.plot(m_history, b_history, np.mean((y - (np.array(m_history) * X.ravel() + np.array(b_history)))**2, axis=0), color='r', label='GD Path', linewidth=2)
+    
+    # MSE values for each point in the path
+    mse_path = [np.mean((y - (m * X.ravel() + b))**2) for m, b in zip(m_history, b_history)]
+    
+    ax4.plot(m_history, b_history, mse_path, color='r', label='GD Path', linewidth=2)
 
     # Set labels
     ax4.set_xlabel('m (slope)')
