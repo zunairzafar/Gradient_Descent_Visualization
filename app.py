@@ -2,8 +2,6 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
-from matplotlib.animation import FuncAnimation
-
 import time
 import io
 
@@ -50,7 +48,7 @@ gd = GDregressor(learning_rate=learning_rate, epochs=epochs)
 # Add a start button to trigger the gradient descent
 start_button = st.button("Start Gradient Descent")
 
-# Full screen CSS styling for maximized layout
+# Full screen CSS styling
 st.markdown("""
     <style>
         .streamlit-expanderHeader {
@@ -69,19 +67,16 @@ st.markdown("""
             background-color: #FF5733;
             color: black;
         }
-        /* Fullscreen style for the animation container */
         .full-screen-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 90vh;  /* 90% of the screen height */
+            height: 90vh;
             width: 100%;
-            margin-top: 5%;
         }
     </style>
     """, unsafe_allow_html=True)
 
-# When button is pressed
 if start_button:
     # Fit the model to the data
     gd.fit(X, y)
@@ -106,7 +101,7 @@ if start_button:
     placeholder = st.empty()
 
     # Function to update the line during animation
-    def update(epoch):
+    for epoch in range(epochs):
         # Get the current values of m and b from the history
         m, b = gd.history[epoch]
         
@@ -115,21 +110,13 @@ if start_button:
         
         # Update the title to show the current epoch
         ax.set_title(f'Epoch {epoch + 1}')
-        return line,
-
-    # Create the FuncAnimation object
-    ani = FuncAnimation(fig, update, frames=len(gd.history), interval=500)
-
-    # Save the animation to a temporary file
-    buf = io.BytesIO()
-    ani.save(buf, writer='ffmpeg', fps=24)
-    buf.seek(0)
-
-    # Display the animation inside the Streamlit app
-    with placeholder.container():
-        st.markdown('<div class="full-screen-container">', unsafe_allow_html=True)
-        st.video(buf)
-        st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Display the updated plot in Streamlit
+        with placeholder.container():
+            st.pyplot(fig, use_container_width=True)
+        
+        # Simulate the animation speed without blocking
+        time.sleep(0.5)  # Adjust the sleep time to control animation speed
 
     # After the animation ends, display the MSE loss and gradient
     st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
