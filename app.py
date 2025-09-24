@@ -46,7 +46,7 @@ epochs = st.sidebar.slider("Epochs", 1, 200, 35)
 gd = GDregressor(learning_rate=learning_rate, epochs=epochs)
 
 # Add a start button to trigger the gradient descent
-start_button = st.button("Start Gradient Descent")
+start_button = st.button("Start Gradient Descent", key="start_button")
 
 # Full screen CSS styling for maximized layout
 st.markdown("""
@@ -76,10 +76,23 @@ st.markdown("""
             width: 100%;
             margin-top: 5%;
         }
+        /* Arrow styling */
+        .arrow {
+            display: block;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid black;
+            margin: auto;
+        }
     </style>
     """, unsafe_allow_html=True)
 
 if start_button:
+    # Hide the button after click
+    start_button = st.empty()
+
     # Fit the model to the data
     gd.fit(X, y)
 
@@ -102,6 +115,14 @@ if start_button:
     # Streamlit container for the animation
     placeholder = st.empty()
 
+    # Display instruction text above the animation with arrow pointing to it
+    st.markdown("""
+        <div style="text-align:center;">
+            <p><strong>Click on the dot below to maximize the screen</strong></p>
+            <div class="arrow"></div>
+        </div>
+    """, unsafe_allow_html=True)
+
     # Function to update the line during animation
     for epoch in range(epochs):
         # Get the current values of m and b from the history
@@ -122,32 +143,41 @@ if start_button:
 
     # After the animation ends, display the MSE loss and gradient
     st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
-    losses = [np.mean((y - (m * X + b))**2) for m, b in gd.history]
-    gradients = [(-2 * np.sum(y - m * X.ravel() - b), -2 * np.sum((y - m * X.ravel() - b) * X.ravel())) for m, b in gd.history]
+    
+    # Create tabs for loss and gradients
+    tab_selection = st.radio("Select plot", ["Loss Function", "Gradient Convergence"])
 
-    # Plot the loss function and gradient
-    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    if tab_selection == "Loss Function":
+        losses = [np.mean((y - (m * X + b))**2) for m, b in gd.history]
 
-    # Plot the MSE loss
-    ax2.plot(losses, label='MSE Loss')
-    ax2.set_xlabel('Epochs')
-    ax2.set_ylabel('Loss')
-    ax2.set_title("Loss Function (MSE) over Epochs")
-    ax2.legend()
+        # Plot the MSE loss
+        fig2, ax2 = plt.subplots(figsize=(8, 6))
 
-    # Plot the gradient (for both m and b)
-    fig3, ax3 = plt.subplots(figsize=(8, 6))
+        # Plot the MSE loss
+        ax2.plot(losses, label='MSE Loss')
+        ax2.set_xlabel('Epochs')
+        ax2.set_ylabel('Loss')
+        ax2.set_title("Loss Function (MSE) over Epochs")
+        ax2.legend()
 
-    gradient_m = [g[0] for g in gradients]
-    gradient_b = [g[1] for g in gradients]
-    ax3.plot(gradient_m, label='Gradient for m')
-    ax3.plot(gradient_b, label='Gradient for b')
+        # Display loss function plot
+        st.pyplot(fig2)
 
-    ax3.set_xlabel('Epochs')
-    ax3.set_ylabel('Gradient')
-    ax3.set_title("Gradients with respect to Loss Function (MSE)")
-    ax3.legend()
+    elif tab_selection == "Gradient Convergence":
+        gradients = [(-2 * np.sum(y - m * X.ravel() - b), -2 * np.sum((y - m * X.ravel() - b) * X.ravel())) for m, b in gd.history]
 
-    # Display loss and gradient plots
-    st.pyplot(fig2)
-    st.pyplot(fig3)
+        # Plot the gradient (for both m and b)
+        fig3, ax3 = plt.subplots(figsize=(8, 6))
+
+        gradient_m = [g[0] for g in gradients]
+        gradient_b = [g[1] for g in gradients]
+        ax3.plot(gradient_m, label='Gradient for m')
+        ax3.plot(gradient_b, label='Gradient for b')
+
+        ax3.set_xlabel('Epochs')
+        ax3.set_ylabel('Gradient')
+        ax3.set_title("Gradients with respect to Loss Function (MSE)")
+        ax3.legend()
+
+        # Display gradient convergence plot
+        st.pyplot(fig3)
