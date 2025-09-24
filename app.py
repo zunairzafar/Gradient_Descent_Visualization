@@ -83,7 +83,7 @@ if start_button:
         
         # Display the updated plot in Streamlit
         with placeholder.container():
-            st.pyplot(fig)
+            st.pyplot(fig, use_container_width=True)
         
         # Simulate the animation speed without blocking
         time.sleep(0.5)  # Adjust the sleep time to control animation speed
