@@ -120,13 +120,3 @@ if start_button:
     st.pyplot(fig2)
     st.pyplot(fig3)
 
-    # 3D Surface Plot showing the error surface and gradient descent path
-    st.subheader("3D Surface Plot - Error Surface")
-
-    # Create a meshgrid for the 3D plot
-    m_vals = np.linspace(-200, 200, 400)
-    b_vals = np.linspace(-200, 200, 400)
-    M, B = np.meshgrid(m_vals, b_vals)
-
-    # Calculate the MSE (Mean Squared Error) for each (m, b) pair
-    Z = np.mean((y[:, None, None] - (M * X.ravel() + B))**2, axis=0)
