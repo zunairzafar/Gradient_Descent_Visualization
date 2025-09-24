@@ -45,16 +45,9 @@ learning_rate = st.sidebar.slider("Learning rate", 0.0001, 0.1, 0.001)
 epochs = st.sidebar.slider("Epochs", 1, 200, 35)
 gd = GDregressor(learning_rate=learning_rate, epochs=epochs)
 
-# Add a start button to trigger the gradient descent
-start_button = st.button("Start Gradient Descent", key="start_button")
-
 # Full screen CSS styling for maximized layout
 st.markdown("""
     <style>
-        .streamlit-expanderHeader {
-            font-size: 22px;
-            font-weight: bold;
-        }
         .stButton>button {
             background-color: #FF5733;
             color: white;
@@ -76,23 +69,41 @@ st.markdown("""
             width: 100%;
             margin-top: 5%;
         }
-        /* Arrow styling */
+        /* Upward Arrow styling */
         .arrow {
             display: block;
             width: 0;
             height: 0;
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
-            border-top: 20px solid black;
+            border-top: 20px solid black;  /* Upward arrow */
             margin: auto;
         }
-        /* Position the arrow and text properly */
+        /* Position the arrow directly below the white dot */
         .arrow-container {
             text-align: center;
-            margin-top: 50px;  /* Adjust to position above the dot */
+            margin-top: 30px;  /* Adjust this to position below the dot */
+            cursor: pointer;
         }
     </style>
     """, unsafe_allow_html=True)
+
+if start_button:
+    # Hide the button after click
+    start_button = st.empty()
+
+    # Display the instruction text and the upward arrow
+    st.markdown("""
+        <div class="arrow-container">
+            <p><div class="arrow"></div><strong>Click on the arrow above to start the animation</strong></p>
+            
+        </div>
+    """, unsafe_allow_html=True)
+
+    # After the user clicks the arrow, the animation will start
+    if st.button("Start Animation"):
+        # Proceed with animation (insert the animation code here)
+        st.write("Animation started!")
 
 if start_button:
     # Hide the button after click
