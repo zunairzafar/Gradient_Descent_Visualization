@@ -2,7 +2,9 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
+from matplotlib.animation import FuncAnimation
 import time
+import matplotlib.animation as animation
 
 # Define the GDregressor class
 class GDregressor:
@@ -89,11 +91,8 @@ if start_button:
     ax.set_ylabel('y')
     ax.legend()
 
-    # Streamlit container for the animation
-    placeholder = st.empty()
-
     # Function to update the line during animation
-    for epoch in range(epochs):
+    def update(epoch):
         # Get the current values of m and b from the history
         m, b = gd.history[epoch]
         
@@ -102,13 +101,16 @@ if start_button:
         
         # Update the title to show the current epoch
         ax.set_title(f'Epoch {epoch + 1}')
-        
-        # Display the updated plot in Streamlit
-        with placeholder.container():
-            st.pyplot(fig, use_container_width=True)
-        
-        # Simulate the animation speed without blocking
-        time.sleep(0.5)  # Adjust the sleep time to control animation speed
+        return line,
+
+    # Create the FuncAnimation object
+    ani = FuncAnimation(fig, update, frames=len(gd.history), interval=500)
+
+    # Save the animation as a .mp4 file
+    ani.save('/mnt/data/gd_animation.mp4', writer='ffmpeg')
+
+    # Display the animation in Streamlit
+    st.video('/mnt/data/gd_animation.mp4')
 
     # After the animation ends, display the MSE loss and gradient
     st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
