@@ -81,8 +81,8 @@ for epoch in range(epochs):
     with placeholder.container():
         st.pyplot(fig)
     
-    # Streamlit automatically reruns the loop every frame, creating a "time delay" effect without blocking
-    st.experimental_rerun()
+    # Streamlit automatically handles rerendering, no need to manually trigger rerun
+    time.sleep(0.5)  # Adjust the sleep time to control animation speed
 
 # After the animation ends, display the MSE loss and gradient
 st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
