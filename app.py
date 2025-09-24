@@ -84,7 +84,6 @@ st.markdown("""
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
             border-top: 20px solid black;
-            border-bottom: 20px solid black;
             margin: auto;
         }
     </style>
@@ -118,12 +117,31 @@ if start_button:
 
     # Display instruction text above the animation with arrow pointing to it
     st.markdown("""
-        <div style="text-align:center;">
-            <div class="arrow"></div>
-            <p><strong>Click on the dot below to maximize the screen</strong></p>
-            
-        </div>
-    """, unsafe_allow_html=True)
+    <style>
+        /* Upward Arrow styling */
+        .arrow {
+            display: block;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid black; /* This makes the arrow point upward */
+            margin-right: 10px; /* Space between arrow and text */
+        }
+        /* Flexbox container for arrow and text */
+        .arrow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;  /* Adjust this to position below the dot */
+        }
+    </style>
+    <div class="arrow-container">
+        <div class="arrow"></div>
+        <p><strong>Click on the dot below to maximize the screen</strong></p>
+    </div>
+""", unsafe_allow_html=True)
+
 
     # Function to update the line during animation
     for epoch in range(epochs):
