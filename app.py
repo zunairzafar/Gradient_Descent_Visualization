@@ -46,6 +46,7 @@ epochs = st.sidebar.slider("Epochs", 1, 200, 35)
 gd = GDregressor(learning_rate=learning_rate, epochs=epochs)
 
 # Add a start button to trigger the gradient descent
+start_button = st.button("Start Gradient Descent", key="start_button")
 
 # Full screen CSS styling for maximized layout
 st.markdown("""
@@ -75,43 +76,128 @@ st.markdown("""
             width: 100%;
             margin-top: 5%;
         }
-        /* Upward Arrow styling */
+        /* Arrow styling */
         .arrow {
             display: block;
             width: 0;
             height: 0;
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
-            border-bottom: 20px solid black;  /* Upward arrow */
+            border-top: 20px solid black;
             margin: auto;
         }
-        /* Position the arrow directly below the button */
+        /* Position the arrow and text properly */
         .arrow-container {
             text-align: center;
-            margin-top: 20px;  /* Adjust the position to be right below the button */
-            cursor: pointer;
+            margin-top: 50px;  /* Adjust to position above the dot */
         }
     </style>
     """, unsafe_allow_html=True)
 
-# Add a start button to trigger the gradient descent
-start_button = st.button("Start Gradient Descent")
-
-# Hide the button after click
 if start_button:
-    # Remove the button from the interface
-    start_button = st.empty()  # This clears the button
+    # Hide the button after click
+    start_button = st.empty()
 
-    # Display the instruction text and the upward arrow
+    # Fit the model to the data
+    gd.fit(X, y)
+
+    # Create a figure and axis for plotting
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    # Plot the data points
+    ax.scatter(X, y, color='blue', label='Data points')
+
+    # Line object for the regression line (initially empty)
+    line, = ax.plot([], [], color='red', label='SGD Regression Line')
+
+    # Set up the axis limits
+    ax.set_xlim(np.min(X) - 1, np.max(X) + 1)
+    ax.set_ylim(np.min(y) - 10, np.max(y) + 10)
+    ax.set_xlabel('X')
+    ax.set_ylabel('y')
+    ax.legend()
+
+    # Streamlit container for the animation
+    placeholder = st.empty()
+
+    # Display instruction text above the animation with arrow pointing to it
     st.markdown("""
         <div class="arrow-container">
-            <p><strong>Click on the arrow below to start the animation</strong></p>
+            <p><strong>Click on the dot below to maximize the screen</strong></p>
             <div class="arrow"></div>
         </div>
     """, unsafe_allow_html=True)
 
-    # After the user clicks the arrow, the animation will start
-    if st.button("Start Animation"):
-        # Proceed with animation (insert the animation code here)
-        st.write("Animation started!")
+    # Function to update the line during animation
+    for epoch in range(epochs):
+        # Get the current values of m and b from the history
+        m, b = gd.history[epoch]
+        
+        # Update the regression line
+        line.set_data(X, m * X + b)
+        
+        # Update the title to show the current epoch
+        ax.set_title(f'Epoch {epoch + 1}')
+        
+        # Display the updated plot in Streamlit
+        with placeholder.container():
+            st.pyplot(fig, use_container_width=True)
+        
+        # Simulate the animation speed without blocking
+        time.sleep(0.5)  # Adjust the sleep time to control animation speed
 
+    # After the animation ends, create tabs for Loss and Gradient convergence
+    st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
+
+    # Create tabs for better organization
+    tab1, tab2, tab3 = st.tabs(["Loss Function", "Gradients", "3D Surface"])
+
+    with tab1:
+        losses = [np.mean((y - (m * X + b))**2) for m, b in gd.history]
+
+        # Plot the MSE loss
+        fig2, ax2 = plt.subplots(figsize=(8, 6))
+        ax2.plot(losses, label='MSE Loss', color='purple')
+        ax2.set_xlabel('Epochs')
+        ax2.set_ylabel('Loss')
+        ax2.set_title("Loss Function (MSE) over Epochs")
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+        st.pyplot(fig2, use_container_width=True)
+
+    with tab2:
+        gradients = [(-2 * np.sum(y - m * X.ravel() - b), -2 * np.sum((y - m * X.ravel() - b) * X.ravel())) for m, b in gd.history]
+
+        # Plot the gradient (for both m and b)
+        fig3, ax3 = plt.subplots(figsize=(8, 6))
+        gradient_m = [g[0] for g in gradients]
+        gradient_b = [g[1] for g in gradients]
+        ax3.plot(gradient_m, label='Gradient for m', color='green')
+        ax3.plot(gradient_b, label='Gradient for b', color='orange')
+        ax3.set_xlabel('Epochs')
+        ax3.set_ylabel('Gradient')
+        ax3.set_title("Gradients with respect to Loss Function (MSE)")
+        ax3.legend()
+        ax3.grid(True, alpha=0.3)
+        st.pyplot(fig3, use_container_width=True)
+
+    with tab3:
+        # 3D Surface Plot of the error surface
+        fig4 = plt.figure(figsize=(8, 6))
+        ax4 = fig4.add_subplot(111, projection='3d')
+
+        # Create a grid of m and b values to plot the error surface
+        m_vals = np.linspace(-200, 200, 100)
+        b_vals = np.linspace(-200, 200, 100)
+        M, B = np.meshgrid(m_vals, b_vals)
+
+        # Calculate the Mean Squared Error over the surface
+        Z = np.mean((y[:, None, None] - (M * X.ravel() + B))**2, axis=0)
+
+        # Plot the surface
+        ax4.plot_surface(M, B, Z, cmap='viridis', alpha=0.7, rstride=2, cstride=2)
+        ax4.set_xlabel('m (Slope)')
+        ax4.set_ylabel('b (Intercept)')
+        ax4.set_zlabel('MSE (Error)')
+        ax4.set_title("3D Surface Plot - Error Surface")
+        st.pyplot(fig4, use_container_width=True)
