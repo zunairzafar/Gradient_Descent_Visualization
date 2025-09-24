@@ -150,8 +150,12 @@ if start_button:
     b_vals = np.linspace(-200, 200, 400)
     M, B = np.meshgrid(m_vals, b_vals)
 
+    # Ensure the shapes align by reshaping y and X
+    X_reshaped = X.ravel().reshape(-1, 1)  # Reshape X to be a column vector
+    y_reshaped = y.reshape(-1, 1)  # Reshape y to be a column vector
+
     # Calculate the MSE (Mean Squared Error) for each (m, b) pair
-    Z = np.mean((y[:, None, None] - (M * X.ravel() + B))**2, axis=0)
+    Z = np.mean((y_reshaped - (M * X_reshaped + B))**2, axis=0)
 
     # Create the 3D plot
     fig4 = plt.figure(figsize=(10, 8))
@@ -163,7 +167,7 @@ if start_button:
     # Plot the gradient descent path
     m_history = [m for m, b in gd.history]
     b_history = [b for m, b in gd.history]
-    ax4.plot(m_history, b_history, np.mean((y[:, None] - (np.array(m_history) * X.ravel() + np.array(b_history)))**2, axis=0), color='r', label='GD Path', linewidth=2)
+    ax4.plot(m_history, b_history, np.mean((y_reshaped - (np.array(m_history) * X_reshaped + np.array(b_history)))**2, axis=0), color='r', label='GD Path', linewidth=2)
 
     # Set labels
     ax4.set_xlabel('m (slope)')
