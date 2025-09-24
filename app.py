@@ -76,24 +76,7 @@ st.markdown("""
             width: 100%;
             margin-top: 5%;
         }
-        .arrow {
-            display: block;
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-bottom: 20px solid black; /* This makes the arrow point upward */
-            margin-right: 10px; /* Space between arrow and text */
-        }
-        /* Flexbox container for arrow and text */
-        .arrow-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 30px;  /* Adjust this to position below the dot */
-        }
-      
-        }
+        
     </style>
     """, unsafe_allow_html=True)
 
@@ -133,7 +116,7 @@ if start_button:
             height: 0;
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
-            border-top: 20px solid black; /* This makes the arrow point upward */
+            border-bottom: 20px solid black; /* This makes the arrow point upward */
             margin-right: 10px; /* Space between arrow and text */
         }
         /* Flexbox container for arrow and text */
@@ -146,9 +129,10 @@ if start_button:
     </style>
     <div class="arrow-container">
         <div class="arrow"></div>
-        <p><strong>Click on the dot above to maximize the screen</strong></p>
+        <p><strong>Click on the dot below to maximize the screen</strong></p>
     </div>
 """, unsafe_allow_html=True)
+
 
 
     # Function to update the line during animation
