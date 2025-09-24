@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
+import time
 
 # Define the GDregressor class
 class GDregressor:
@@ -80,8 +81,8 @@ for epoch in range(epochs):
     with placeholder.container():
         st.pyplot(fig)
     
-    # Simulate the animation speed (slower interval)
-    time.sleep(0.5)
+    # Streamlit automatically reruns the loop every frame, creating a "time delay" effect without blocking
+    st.experimental_rerun()
 
 # After the animation ends, display the MSE loss and gradient
 st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
