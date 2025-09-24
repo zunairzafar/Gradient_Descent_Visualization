@@ -48,7 +48,7 @@ gd = GDregressor(learning_rate=learning_rate, epochs=epochs)
 # Add a start button to trigger the gradient descent
 start_button = st.button("Start Gradient Descent")
 
-# Full screen CSS styling
+# Full screen CSS styling for maximized layout
 st.markdown("""
     <style>
         .streamlit-expanderHeader {
@@ -67,12 +67,14 @@ st.markdown("""
             background-color: #FF5733;
             color: black;
         }
+        /* Fullscreen style for the animation container */
         .full-screen-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 90vh;
+            height: 90vh;  /* 90% of the screen height */
             width: 100%;
+            margin-top: 5%;
         }
     </style>
     """, unsafe_allow_html=True)
