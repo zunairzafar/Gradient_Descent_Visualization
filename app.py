@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
 from matplotlib.animation import FuncAnimation
 import time
-import matplotlib.animation as animation
+import tempfile
+import shutil
 
 # Define the GDregressor class
 class GDregressor:
@@ -106,11 +107,12 @@ if start_button:
     # Create the FuncAnimation object
     ani = FuncAnimation(fig, update, frames=len(gd.history), interval=500)
 
-    # Save the animation as a .mp4 file
-    ani.save('/mnt/data/gd_animation.mp4', writer='ffmpeg')
+    # Save the animation to a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
+        ani.save(tmpfile.name, writer='ffmpeg')
 
-    # Display the animation in Streamlit
-    st.video('/mnt/data/gd_animation.mp4')
+        # Display the animation in Streamlit
+        st.video(tmpfile.name)
 
     # After the animation ends, display the MSE loss and gradient
     st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
