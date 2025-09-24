@@ -156,40 +156,55 @@ if start_button:
     # After the animation ends, display the MSE loss and gradient
     st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
     
-    # Create tabs for loss and gradients
-    tab_selection = st.radio("Select plot", ["Loss Function", "Gradient Convergence"])
+     # Create tabs for better organization
+    tab1, tab2, tab3 = st.tabs(["Loss Function", "Gradients", "3D Surface"])
 
-    if tab_selection == "Loss Function":
+    with tab1:
         losses = [np.mean((y - (m * X + b))**2) for m, b in gd.history]
 
         # Plot the MSE loss
         fig2, ax2 = plt.subplots(figsize=(8, 6))
-
-        # Plot the MSE loss
-        ax2.plot(losses, label='MSE Loss')
+        ax2.plot(losses, label='MSE Loss', color='purple')
         ax2.set_xlabel('Epochs')
         ax2.set_ylabel('Loss')
         ax2.set_title("Loss Function (MSE) over Epochs")
         ax2.legend()
+        ax2.grid(True, alpha=0.3)
+        st.pyplot(fig2, use_container_width=True)
 
-        # Display loss function plot
-        st.pyplot(fig2)
-
-    elif tab_selection == "Gradient Convergence":
+    with tab2:
         gradients = [(-2 * np.sum(y - m * X.ravel() - b), -2 * np.sum((y - m * X.ravel() - b) * X.ravel())) for m, b in gd.history]
 
         # Plot the gradient (for both m and b)
         fig3, ax3 = plt.subplots(figsize=(8, 6))
-
         gradient_m = [g[0] for g in gradients]
         gradient_b = [g[1] for g in gradients]
-        ax3.plot(gradient_m, label='Gradient for m')
-        ax3.plot(gradient_b, label='Gradient for b')
-
+        ax3.plot(gradient_m, label='Gradient for m', color='green')
+        ax3.plot(gradient_b, label='Gradient for b', color='orange')
         ax3.set_xlabel('Epochs')
         ax3.set_ylabel('Gradient')
         ax3.set_title("Gradients with respect to Loss Function (MSE)")
         ax3.legend()
+        ax3.grid(True, alpha=0.3)
+        st.pyplot(fig3, use_container_width=True)
 
-        # Display gradient convergence plot
-        st.pyplot(fig3)
+    with tab3:
+        # 3D Surface Plot of the error surface
+        fig4 = plt.figure(figsize=(8, 6))
+        ax4 = fig4.add_subplot(111, projection='3d')
+
+        # Create a grid of m and b values to plot the error surface
+        m_vals = np.linspace(-200, 200, 100)
+        b_vals = np.linspace(-200, 200, 100)
+        M, B = np.meshgrid(m_vals, b_vals)
+
+        # Calculate the Mean Squared Error over the surface
+        Z = np.mean((y[:, None, None] - (M * X.ravel() + B))**2, axis=0)
+
+        # Plot the surface
+        ax4.plot_surface(M, B, Z, cmap='viridis', alpha=0.7, rstride=2, cstride=2)
+        ax4.set_xlabel('m (Slope)')
+        ax4.set_ylabel('b (Intercept)')
+        ax4.set_zlabel('MSE (Error)')
+        ax4.set_title("3D Surface Plot - Error Surface")
+        st.pyplot(fig4, use_container_width=True)
