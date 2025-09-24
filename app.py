@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
+from mpl_toolkits.mplot3d import Axes3D
 import time
 
 # Define the GDregressor class
@@ -44,74 +45,111 @@ learning_rate = st.sidebar.slider("Learning rate", 0.0001, 0.1, 0.001)
 epochs = st.sidebar.slider("Epochs", 1, 200, 35)
 gd = GDregressor(learning_rate=learning_rate, epochs=epochs)
 
-# Fit the model to the data
-gd.fit(X, y)
+# Add a start button to trigger the gradient descent
+start_button = st.button("Start Gradient Descent")
 
-# Create a figure and axis for plotting
-fig, ax = plt.subplots(figsize=(8, 6))
+if start_button:
+    # Fit the model to the data
+    gd.fit(X, y)
 
-# Plot the data points
-ax.scatter(X, y, color='blue', label='Data points')
+    # Create a figure and axis for plotting
+    fig, ax = plt.subplots(figsize=(8, 6))
 
-# Line object for the regression line (initially empty)
-line, = ax.plot([], [], color='red', label='SGD Regression Line')
+    # Plot the data points
+    ax.scatter(X, y, color='blue', label='Data points')
 
-# Set up the axis limits
-ax.set_xlim(np.min(X) - 1, np.max(X) + 1)
-ax.set_ylim(np.min(y) - 10, np.max(y) + 10)
-ax.set_xlabel('X')
-ax.set_ylabel('y')
-ax.legend()
+    # Line object for the regression line (initially empty)
+    line, = ax.plot([], [], color='red', label='SGD Regression Line')
 
-# Streamlit container for the animation
-placeholder = st.empty()
+    # Set up the axis limits
+    ax.set_xlim(np.min(X) - 1, np.max(X) + 1)
+    ax.set_ylim(np.min(y) - 10, np.max(y) + 10)
+    ax.set_xlabel('X')
+    ax.set_ylabel('y')
+    ax.legend()
 
-# Function to update the line during animation
-for epoch in range(epochs):
-    # Get the current values of m and b from the history
-    m, b = gd.history[epoch]
-    
-    # Update the regression line
-    line.set_data(X, m * X + b)
-    
-    # Update the title to show the current epoch
-    ax.set_title(f'Epoch {epoch + 1}')
-    
-    # Display the updated plot in Streamlit
-    with placeholder.container():
-        st.pyplot(fig)
-    
-    # Streamlit automatically handles rerendering, no need to manually trigger rerun
-    time.sleep(0.5)  # Adjust the sleep time to control animation speed
+    # Streamlit container for the animation
+    placeholder = st.empty()
 
-# After the animation ends, display the MSE loss and gradient
-st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
-losses = [np.mean((y - (m * X + b))**2) for m, b in gd.history]
-gradients = [(-2 * np.sum(y - m * X.ravel() - b), -2 * np.sum((y - m * X.ravel() - b) * X.ravel())) for m, b in gd.history]
+    # Function to update the line during animation
+    for epoch in range(epochs):
+        # Get the current values of m and b from the history
+        m, b = gd.history[epoch]
+        
+        # Update the regression line
+        line.set_data(X, m * X + b)
+        
+        # Update the title to show the current epoch
+        ax.set_title(f'Epoch {epoch + 1}')
+        
+        # Display the updated plot in Streamlit
+        with placeholder.container():
+            st.pyplot(fig)
+        
+        # Simulate the animation speed without blocking
+        time.sleep(0.5)  # Adjust the sleep time to control animation speed
 
-# Plot the loss function and gradient
-fig2, ax2 = plt.subplots(figsize=(8, 6))
+    # After the animation ends, display the MSE loss and gradient
+    st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
+    losses = [np.mean((y - (m * X + b))**2) for m, b in gd.history]
+    gradients = [(-2 * np.sum(y - m * X.ravel() - b), -2 * np.sum((y - m * X.ravel() - b) * X.ravel())) for m, b in gd.history]
 
-# Plot the MSE loss
-ax2.plot(losses, label='MSE Loss')
-ax2.set_xlabel('Epochs')
-ax2.set_ylabel('Loss')
-ax2.set_title("Loss Function (MSE) over Epochs")
-ax2.legend()
+    # Plot the loss function and gradient
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
 
-# Plot the gradient (for both m and b)
-fig3, ax3 = plt.subplots(figsize=(8, 6))
+    # Plot the MSE loss
+    ax2.plot(losses, label='MSE Loss')
+    ax2.set_xlabel('Epochs')
+    ax2.set_ylabel('Loss')
+    ax2.set_title("Loss Function (MSE) over Epochs")
+    ax2.legend()
 
-gradient_m = [g[0] for g in gradients]
-gradient_b = [g[1] for g in gradients]
-ax3.plot(gradient_m, label='Gradient for m')
-ax3.plot(gradient_b, label='Gradient for b')
+    # Plot the gradient (for both m and b)
+    fig3, ax3 = plt.subplots(figsize=(8, 6))
 
-ax3.set_xlabel('Epochs')
-ax3.set_ylabel('Gradient')
-ax3.set_title("Gradients with respect to Loss Function (MSE)")
-ax3.legend()
+    gradient_m = [g[0] for g in gradients]
+    gradient_b = [g[1] for g in gradients]
+    ax3.plot(gradient_m, label='Gradient for m')
+    ax3.plot(gradient_b, label='Gradient for b')
 
-# Display loss and gradient plots
-st.pyplot(fig2)
-st.pyplot(fig3)
+    ax3.set_xlabel('Epochs')
+    ax3.set_ylabel('Gradient')
+    ax3.set_title("Gradients with respect to Loss Function (MSE)")
+    ax3.legend()
+
+    # Display loss and gradient plots
+    st.pyplot(fig2)
+    st.pyplot(fig3)
+
+    # 3D Surface Plot showing the error surface and gradient descent path
+    st.subheader("3D Surface Plot - Error Surface")
+
+    # Create a meshgrid for the 3D plot
+    m_vals = np.linspace(-200, 200, 400)
+    b_vals = np.linspace(-200, 200, 400)
+    M, B = np.meshgrid(m_vals, b_vals)
+
+    # Calculate the MSE (Mean Squared Error) for each (m, b) pair
+    Z = np.mean((y[:, None, None] - (M * X.ravel() + B))**2, axis=0)
+
+    # Create the 3D plot
+    fig4 = plt.figure(figsize=(10, 8))
+    ax4 = fig4.add_subplot(111, projection='3d')
+
+    # Plot the surface
+    ax4.plot_surface(M, B, Z, cmap='viridis', edgecolor='none')
+
+    # Plot the gradient descent path
+    m_history = [m for m, b in gd.history]
+    b_history = [b for m, b in gd.history]
+    ax4.plot(m_history, b_history, np.mean((y[:, None] - (np.array(m_history) * X.ravel() + np.array(b_history)))**2, axis=0), color='r', label='GD Path', linewidth=2)
+
+    # Set labels
+    ax4.set_xlabel('m (slope)')
+    ax4.set_ylabel('b (intercept)')
+    ax4.set_zlabel('Error (MSE)')
+    ax4.set_title('Gradient Descent on Error Surface')
+    ax4.legend()
+
+    # Display the 3D surface plot
+    st.pyplot(fig4)
