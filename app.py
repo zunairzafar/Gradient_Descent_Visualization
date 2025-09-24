@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
-from mpl_toolkits.mplot3d import Axes3D
 import time
 
 # Define the GDregressor class
