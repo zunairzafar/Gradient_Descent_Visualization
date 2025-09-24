@@ -72,7 +72,7 @@ st.markdown("""
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 90vh;  /* 90% of the screen height */
+            height: 80vh;  /* 80% of the screen height */
             width: 100%;
             margin-top: 5%;
         }
