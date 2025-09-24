@@ -2,9 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
-from matplotlib.animation import FuncAnimation
 import time
-import io
 
 # Define the GDregressor class
 class GDregressor:
@@ -78,7 +76,6 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# When button is pressed
 if start_button:
     # Fit the model to the data
     gd.fit(X, y)
@@ -117,7 +114,7 @@ if start_button:
     # Create the FuncAnimation object
     ani = FuncAnimation(fig, update, frames=len(gd.history), interval=500)
 
-    # Save the animation to a temporary file in memory
+    # Save the animation to a temporary file
     buf = io.BytesIO()
     ani.save(buf, writer='ffmpeg', fps=24)
     buf.seek(0)
@@ -159,3 +156,4 @@ if start_button:
     # Display loss and gradient plots
     st.pyplot(fig2)
     st.pyplot(fig3)
+
