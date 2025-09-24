@@ -84,6 +84,7 @@ st.markdown("""
             border-left: 10px solid transparent;
             border-right: 10px solid transparent;
             border-top: 20px solid black;
+            border-bottom: 20px solid black;
             margin: auto;
         }
     </style>
@@ -118,8 +119,9 @@ if start_button:
     # Display instruction text above the animation with arrow pointing to it
     st.markdown("""
         <div style="text-align:center;">
-            <p><strong>Click on the dot below to maximize the screen</strong></p>
             <div class="arrow"></div>
+            <p><strong>Click on the dot below to maximize the screen</strong></p>
+            
         </div>
     """, unsafe_allow_html=True)
 
