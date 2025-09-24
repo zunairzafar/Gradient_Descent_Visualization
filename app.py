@@ -45,7 +45,29 @@ epochs = st.sidebar.slider("Epochs", 1, 200, 35)
 gd = GDregressor(learning_rate=learning_rate, epochs=epochs)
 
 # Add a start button to trigger the gradient descent
-start_button = st.button("Start Gradient Descent")
+start_button = st.button("Start Gradient Descent", key="start_button", help="Click to begin the Gradient Descent animation")
+
+# Add styling for the button to make it more prominent
+st.markdown("""
+    <style>
+        .streamlit-expanderHeader {
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .stButton>button {
+            background-color: #FF5733;
+            color: white;
+            font-size: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+        }
+        .stButton>button:hover {
+            background-color: #FF5733;
+            color: black;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
 if start_button:
     # Fit the model to the data
