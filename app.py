@@ -95,8 +95,8 @@ if start_button:
     # Display the instruction text and the upward arrow
     st.markdown("""
         <div class="arrow-container">
-            <p><div class="arrow"></div><strong>Click on the arrow above to start the animation</strong></p>
-            
+            <p><strong>Click on the arrow above to start the animation</strong></p>
+            <div class="arrow"></div>
         </div>
     """, unsafe_allow_html=True)
 
