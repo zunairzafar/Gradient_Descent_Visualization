@@ -2,9 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
-from matplotlib.animation import FuncAnimation
 import time
-import tempfile
 
 # Define the GDregressor class
 class GDregressor:
@@ -47,29 +45,7 @@ epochs = st.sidebar.slider("Epochs", 1, 200, 35)
 gd = GDregressor(learning_rate=learning_rate, epochs=epochs)
 
 # Add a start button to trigger the gradient descent
-start_button = st.button("Start Gradient Descent", key="start_button", help="Click to begin the Gradient Descent animation")
-
-# Add styling for the button to make it more prominent
-st.markdown("""
-    <style>
-        .streamlit-expanderHeader {
-            font-size: 22px;
-            font-weight: bold;
-        }
-        .stButton>button {
-            background-color: #FF5733;
-            color: white;
-            font-size: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            border: none;
-        }
-        .stButton>button:hover {
-            background-color: #FF5733;
-            color: black;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+start_button = st.button("Start Gradient Descent")
 
 if start_button:
     # Fit the model to the data
@@ -91,8 +67,11 @@ if start_button:
     ax.set_ylabel('y')
     ax.legend()
 
+    # Streamlit container for the animation
+    placeholder = st.empty()
+
     # Function to update the line during animation
-    def update(epoch):
+    for epoch in range(epochs):
         # Get the current values of m and b from the history
         m, b = gd.history[epoch]
         
@@ -101,17 +80,13 @@ if start_button:
         
         # Update the title to show the current epoch
         ax.set_title(f'Epoch {epoch + 1}')
-        return line,
-
-    # Create the FuncAnimation object
-    ani = FuncAnimation(fig, update, frames=len(gd.history), interval=500)
-
-    # Save the animation to a temporary file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmpfile:
-        ani.save(tmpfile.name, writer='ffmpeg', fps=24)
-
-        # Display the animation in Streamlit
-        st.video(tmpfile.name)
+        
+        # Display the updated plot in Streamlit
+        with placeholder.container():
+            st.pyplot(fig, use_container_width=True)
+        
+        # Simulate the animation speed without blocking
+        time.sleep(0.5)  # Adjust the sleep time to control animation speed
 
     # After the animation ends, display the MSE loss and gradient
     st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
@@ -154,28 +129,19 @@ if start_button:
     M, B = np.meshgrid(m_vals, b_vals)
 
     # Calculate the MSE (Mean Squared Error) for each (m, b) pair
-    Z = np.zeros(M.shape)
-
-    # We need to compute the error surface for each (m, b)
-    for i in range(M.shape[0]):
-        for j in range(M.shape[1]):
-            Z[i, j] = np.mean((y - (M[i, j] * X.ravel() + B[i, j]))**2)
+    Z = np.mean((y[:, None, None] - (M * X.ravel() + B))**2, axis=0)
 
     # Create the 3D plot
     fig4 = plt.figure(figsize=(10, 8))
     ax4 = fig4.add_subplot(111, projection='3d')
 
     # Plot the surface
-    ax4.plot_surface(M, B, Z, cmap='viridis', alpha=0.7, rstride=2, cstride=2)
+    ax4.plot_surface(M, B, Z, cmap='viridis', edgecolor='none')
 
     # Plot the gradient descent path
     m_history = [m for m, b in gd.history]
     b_history = [b for m, b in gd.history]
-    
-    # MSE values for each point in the path
-    mse_path = [np.mean((y - (m * X.ravel() + b))**2) for m, b in zip(m_history, b_history)]
-    
-    ax4.plot(m_history, b_history, mse_path, color='r', label='GD Path', linewidth=2)
+    ax4.plot(m_history, b_history, np.mean((y[:, None] - (np.array(m_history) * X.ravel() + np.array(b_history)))**2, axis=0), color='r', label='GD Path', linewidth=2)
 
     # Set labels
     ax4.set_xlabel('m (slope)')
