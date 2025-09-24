@@ -66,11 +66,6 @@ st.markdown("""
             background-color: #FF5733;
             color: black;
         }
-        .stPlotlyChart, .stPyplot {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -117,74 +112,70 @@ if start_button:
 
     # After the animation ends, display the MSE loss and gradient
     st.subheader("Gradient Descent Loss Function and Gradient (MSE)")
-    
-    # Create tabs for better organization
-    tab1, tab2, tab3 = st.tabs(["Loss Function", "Gradients", "3D Surface"])
-    
-    with tab1:
-        losses = [np.mean((y - (m * X + b))**2) for m, b in gd.history]
-        
-        # Plot the loss function
-        fig2, ax2 = plt.subplots(figsize=(8, 6))
-        ax2.plot(losses, label='MSE Loss', color='purple')
-        ax2.set_xlabel('Epochs')
-        ax2.set_ylabel('Loss')
-        ax2.set_title("Loss Function (MSE) over Epochs")
-        ax2.legend()
-        ax2.grid(True, alpha=0.3)
-        st.pyplot(fig2, use_container_width=True)
-    
-    with tab2:
-        gradients = [(-2 * np.sum(y - m * X.ravel() - b), -2 * np.sum((y - m * X.ravel() - b) * X.ravel())) for m, b in gd.history]
-        
-        # Plot the gradient (for both m and b)
-        fig3, ax3 = plt.subplots(figsize=(8, 6))
-        gradient_m = [g[0] for g in gradients]
-        gradient_b = [g[1] for g in gradients]
-        ax3.plot(gradient_m, label='Gradient for m', color='green')
-        ax3.plot(gradient_b, label='Gradient for b', color='orange')
-        ax3.set_xlabel('Epochs')
-        ax3.set_ylabel('Gradient')
-        ax3.set_title("Gradients with respect to Loss Function (MSE)")
-        ax3.legend()
-        ax3.grid(True, alpha=0.3)
-        st.pyplot(fig3, use_container_width=True)
-    
-    with tab3:
-        # 3D Surface Plot showing the error surface and gradient descent path
-        st.markdown("3D Surface Plot - Error Surface")
-        
-        # Create a meshgrid for the 3D plot with fewer points for better performance
-        m_vals = np.linspace(-200, 200, 100)
-        b_vals = np.linspace(-200, 200, 100)
-        M, B = np.meshgrid(m_vals, b_vals)
-        
-        # Ensure the shapes align by reshaping y and X
-        X_reshaped = X.ravel().reshape(-1, 1)
-        y_reshaped = y.reshape(-1, 1)
-        
-        # Calculate the MSE for each (m, b) pair
-        Z = np.mean((y_reshaped - (M * X_reshaped + B))**2, axis=0)
-        
-        # Create the 3D plot
-        fig4 = plt.figure(figsize=(10, 8))
-        ax4 = fig4.add_subplot(111, projection='3d')
-        
-        # Plot the surface with lower resolution for better performance
-        ax4.plot_surface(M, B, Z, cmap='viridis', alpha=0.7, rstride=2, cstride=2)
-        
-        # Plot the gradient descent path
-        m_history = [m for m, b in gd.history]
-        b_history = [b for m, b in gd.history]
-        error_history = [np.mean((y - (m * X + b))**2) for m, b in gd.history]
-        ax4.plot(m_history, b_history, error_history, color='r', label='GD Path', linewidth=3)
-        
-        # Set labels
-        ax4.set_xlabel('m (slope)')
-        ax4.set_ylabel('b (intercept)')
-        ax4.set_zlabel('Error (MSE)')
-        ax4.set_title('Gradient Descent on Error Surface')
-        ax4.legend()
-        
-        # Display the 3D surface plot
-        st.pyplot(fig4, use_container_width=True)
+    losses = [np.mean((y - (m * X + b))**2) for m, b in gd.history]
+    gradients = [(-2 * np.sum(y - m * X.ravel() - b), -2 * np.sum((y - m * X.ravel() - b) * X.ravel())) for m, b in gd.history]
+
+    # Plot the loss function and gradient
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+
+    # Plot the MSE loss
+    ax2.plot(losses, label='MSE Loss')
+    ax2.set_xlabel('Epochs')
+    ax2.set_ylabel('Loss')
+    ax2.set_title("Loss Function (MSE) over Epochs")
+    ax2.legend()
+
+    # Plot the gradient (for both m and b)
+    fig3, ax3 = plt.subplots(figsize=(8, 6))
+
+    gradient_m = [g[0] for g in gradients]
+    gradient_b = [g[1] for g in gradients]
+    ax3.plot(gradient_m, label='Gradient for m')
+    ax3.plot(gradient_b, label='Gradient for b')
+
+    ax3.set_xlabel('Epochs')
+    ax3.set_ylabel('Gradient')
+    ax3.set_title("Gradients with respect to Loss Function (MSE)")
+    ax3.legend()
+
+    # Display loss and gradient plots
+    st.pyplot(fig2)
+    st.pyplot(fig3)
+
+    # 3D Surface Plot showing the error surface and gradient descent path
+    st.subheader("3D Surface Plot - Error Surface")
+
+    # Create a meshgrid for the 3D plot
+    m_vals = np.linspace(-200, 200, 400)
+    b_vals = np.linspace(-200, 200, 400)
+    M, B = np.meshgrid(m_vals, b_vals)
+
+    # Calculate the MSE (Mean Squared Error) for each (m, b) pair
+    Z = np.zeros(M.shape)
+
+    # We need to compute the error surface for each (m, b)
+    for i in range(M.shape[0]):
+        for j in range(M.shape[1]):
+            Z[i, j] = np.mean((y - (M[i, j] * X.ravel() + B[i, j]))**2)
+
+    # Create the 3D plot
+    fig4 = plt.figure(figsize=(10, 8))
+    ax4 = fig4.add_subplot(111, projection='3d')
+
+    # Plot the surface
+    ax4.plot_surface(M, B, Z, cmap='viridis', alpha=0.7, rstride=2, cstride=2)
+
+    # Plot the gradient descent path
+    m_history = [m for m, b in gd.history]
+    b_history = [b for m, b in gd.history]
+    ax4.plot(m_history, b_history, np.mean((y - (np.array(m_history) * X.ravel() + np.array(b_history)))**2, axis=0), color='r', label='GD Path', linewidth=2)
+
+    # Set labels
+    ax4.set_xlabel('m (slope)')
+    ax4.set_ylabel('b (intercept)')
+    ax4.set_zlabel('Error (MSE)')
+    ax4.set_title('Gradient Descent on Error Surface')
+    ax4.legend()
+
+    # Display the 3D surface plot
+    st.pyplot(fig4)
