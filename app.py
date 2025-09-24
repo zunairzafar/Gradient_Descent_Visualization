@@ -46,7 +46,6 @@ epochs = st.sidebar.slider("Epochs", 1, 200, 35)
 gd = GDregressor(learning_rate=learning_rate, epochs=epochs)
 
 # Add a start button to trigger the gradient descent
-start_button = st.button("Start Gradient Descent", key="start_button")
 
 # Full screen CSS styling for maximized layout
 st.markdown("""
@@ -95,6 +94,24 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# Add a start button to trigger the gradient descent
+start_button = st.button("Start Gradient Descent")
+
+# Hide the button after click
 if start_button:
-    # Hide the button after click
-    start_b_
+    # Remove the button from the interface
+    start_button = st.empty()  # This clears the button
+
+    # Display the instruction text and the upward arrow
+    st.markdown("""
+        <div class="arrow-container">
+            <p><strong>Click on the arrow below to start the animation</strong></p>
+            <div class="arrow"></div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # After the user clicks the arrow, the animation will start
+    if st.button("Start Animation"):
+        # Proceed with animation (insert the animation code here)
+        st.write("Animation started!")
+
